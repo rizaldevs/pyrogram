@@ -36,8 +36,6 @@ class EditInlineText:
     ) -> bool:
         """Edit the text of inline messages.
 
-        .. include:: /_includes/usable-by/bots.rst
-
         Parameters:
             inline_message_id (``str``):
                 Identifier of the inline message.

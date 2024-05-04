@@ -30,8 +30,6 @@ class DeleteUserHistory:
     ) -> bool:
         """Delete all messages sent by a certain user in a supergroup.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             chat_id (``int`` | ``str``):
                 Unique identifier (int) or username (str) of the target chat.

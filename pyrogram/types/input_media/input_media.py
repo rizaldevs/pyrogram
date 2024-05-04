@@ -16,7 +16,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with Pyrogram.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import List, Union, BinaryIO
+from typing import List
 
 from ..messages_and_media import MessageEntity
 from ..object import Object
@@ -36,7 +36,7 @@ class InputMedia(Object):
 
     def __init__(
         self,
-        media: Union[str, BinaryIO],
+        media: str,
         caption: str = "",
         parse_mode: str = None,
         caption_entities: List[MessageEntity] = None

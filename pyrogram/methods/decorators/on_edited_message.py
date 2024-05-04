@@ -51,7 +51,7 @@ class OnEditedMessage:
 
                 func.handlers.append(
                     (
-                        pyrogram.handlers.EditedMessageHandler(func, self),
+                        pyrogram.handlers.MessageHandler(func, self),
                         group if filters is None else filters
                     )
                 )

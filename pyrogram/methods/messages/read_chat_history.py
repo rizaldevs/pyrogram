@@ -30,8 +30,6 @@ class ReadChatHistory:
     ) -> bool:
         """Mark a chat's message history as read.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             chat_id (``int`` | ``str``):
                 Unique identifier (int) or username (str) of the target chat.
@@ -49,10 +47,10 @@ class ReadChatHistory:
             .. code-block:: python
 
                 # Mark the whole chat as read
-                await app.read_chat_history(chat_id)
+                await app.read_history(chat_id)
 
                 # Mark messages as read only up to the given message id
-                await app.read_chat_history(chat_id, 12345)
+                await app.read_history(chat_id, 12345)
         """
 
         peer = await self.resolve_peer(chat_id)

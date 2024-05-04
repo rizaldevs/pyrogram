@@ -31,8 +31,6 @@ class DeleteProfilePhotos:
     ) -> bool:
         """Delete your own profile photos.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             photo_ids (``str`` | List of ``str``):
                 A single :obj:`~pyrogram.types.Photo` id as string or multiple ids as list of strings for deleting
@@ -45,7 +43,7 @@ class DeleteProfilePhotos:
             .. code-block:: python
 
                 # Get the photos to be deleted
-                photos = [p async for p in app.get_chat_photos("me")]
+                photos = await app.get_profile_photos("me")
 
                 # Delete one photo
                 await app.delete_profile_photos(photos[0].file_id)

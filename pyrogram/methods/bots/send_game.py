@@ -40,8 +40,6 @@ class SendGame:
     ) -> "types.Message":
         """Send a game.
 
-        .. include:: /_includes/usable-by/bots.rst
-
         Parameters:
             chat_id (``int`` | ``str``):
                 Unique identifier (int) or username (str) of the target chat.

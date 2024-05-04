@@ -31,8 +31,6 @@ class AddChatMembers:
     ) -> bool:
         """Add new chat members to a group, supergroup or channel
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             chat_id (``int`` | ``str``):
                 The group, supergroup or channel id

@@ -40,8 +40,6 @@ class SearchGlobal:
             Due to server-side limitations, you can only get up to around ~10,000 messages and each message
             retrieved will not have any *reply_to_message* field.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             query (``str``, *optional*):
                 Text query string.
@@ -104,7 +102,7 @@ class SearchGlobal:
 
             last = messages[-1]
 
-            offset_date = utils.datetime_to_timestamp(last.date)
+            offset_date = last.date
             offset_peer = await self.resolve_peer(last.chat.id)
             offset_id = last.id
 

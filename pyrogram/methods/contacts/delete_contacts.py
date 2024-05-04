@@ -29,11 +29,9 @@ class DeleteContacts:
     ) -> Union["types.User", List["types.User"], None]:
         """Delete contacts from your Telegram address book.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             user_ids (``int`` | ``str`` | List of ``int`` or ``str``):
-                A single user id/username or a list of user identifiers (id or username).
+                A single user id/username o a list of user identifiers (id or username).
 
         Returns:
             :obj:`~pyrogram.types.User` | List of :obj:`~pyrogram.types.User` | ``None``: In case *user_ids* was an
@@ -47,9 +45,9 @@ class DeleteContacts:
                 await app.delete_contacts(user_id)
                 await app.delete_contacts([user_id1, user_id2, user_id3])
         """
-        is_list = isinstance(user_ids, list)
+        is_user_ids_list = isinstance(user_ids, list)
 
-        if not is_list:
+        if not is_user_ids_list:
             user_ids = [user_ids]
 
         r = await self.invoke(
@@ -63,4 +61,7 @@ class DeleteContacts:
 
         users = types.List([types.User._parse(self, i) for i in r.users])
 
-        return users if is_list else users[0]
+        if is_user_ids_list:
+            return users
+        else:
+            return users[0]

@@ -31,10 +31,6 @@ class ReplyKeyboardMarkup(Object):
         keyboard (List of List of :obj:`~pyrogram.types.KeyboardButton`):
             List of button rows, each represented by a List of KeyboardButton objects.
 
-        is_persistent (``bool``, *optional*):
-            Requests clients to always show the keyboard when the regular keyboard is hidden.
-            Defaults to false, in which case the custom keyboard can be hidden and opened with a keyboard icon.
-
         resize_keyboard (``bool``, *optional*):
             Requests clients to resize the keyboard vertically for optimal fit (e.g., make the keyboard smaller if
             there are just two rows of buttons). Defaults to false, in which case the custom keyboard is always of
@@ -59,7 +55,6 @@ class ReplyKeyboardMarkup(Object):
     def __init__(
         self,
         keyboard: List[List[Union["types.KeyboardButton", str]]],
-        is_persistent: bool = None,
         resize_keyboard: bool = None,
         one_time_keyboard: bool = None,
         selective: bool = None,
@@ -68,14 +63,13 @@ class ReplyKeyboardMarkup(Object):
         super().__init__()
 
         self.keyboard = keyboard
-        self.is_persistent = is_persistent
         self.resize_keyboard = resize_keyboard
         self.one_time_keyboard = one_time_keyboard
         self.selective = selective
         self.placeholder = placeholder
 
     @staticmethod
-    def read(kb: "raw.base.ReplyMarkup"):
+    def read(kb):
         keyboard = []
 
         for i in kb.rows:
@@ -88,7 +82,6 @@ class ReplyKeyboardMarkup(Object):
 
         return ReplyKeyboardMarkup(
             keyboard=keyboard,
-            is_persistent=kb.persistent,
             resize_keyboard=kb.resize,
             one_time_keyboard=kb.single_use,
             selective=kb.selective,
@@ -107,6 +100,5 @@ class ReplyKeyboardMarkup(Object):
             resize=self.resize_keyboard or None,
             single_use=self.one_time_keyboard or None,
             selective=self.selective or None,
-            persistent=self.is_persistent or None,
             placeholder=self.placeholder or None
         )

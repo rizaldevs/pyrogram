@@ -30,14 +30,12 @@ class RestrictChatMember:
         chat_id: Union[int, str],
         user_id: Union[int, str],
         permissions: "types.ChatPermissions",
-        until_date: datetime = utils.zero_datetime()
+        until_date: datetime = datetime.fromtimestamp(0)
     ) -> "types.Chat":
         """Restrict a user in a supergroup.
 
         You must be an administrator in the supergroup for this to work and must have the appropriate admin rights.
         Pass True for all permissions to lift restrictions from a user.
-
-        .. include:: /_includes/usable-by/users-bots.rst
 
         Parameters:
             chat_id (``int`` | ``str``):

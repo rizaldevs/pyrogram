@@ -23,7 +23,7 @@ import hashlib
 import os
 import struct
 from concurrent.futures.thread import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import datetime
 from getpass import getpass
 from typing import Union, List, Dict, Optional
 
@@ -42,16 +42,13 @@ async def ainput(prompt: str = "", *, hide: bool = False):
 
 def get_input_media_from_file_id(
     file_id: str,
-    expected_file_type: FileType = None,
-    ttl_seconds: int = None
+    expected_file_type: FileType = None
 ) -> Union["raw.types.InputMediaPhoto", "raw.types.InputMediaDocument"]:
     try:
         decoded = FileId.decode(file_id)
     except Exception:
-        raise ValueError(
-            f'Failed to decode "{file_id}". The value does not represent an existing local file, '
-            f"HTTP URL, or valid file id."
-        )
+        raise ValueError(f'Failed to decode "{file_id}". The value does not represent an existing local file, '
+                         f'HTTP URL, or valid file id.')
 
     file_type = decoded.file_type
 
@@ -67,8 +64,7 @@ def get_input_media_from_file_id(
                 id=decoded.media_id,
                 access_hash=decoded.access_hash,
                 file_reference=decoded.file_reference
-            ),
-            ttl_seconds=ttl_seconds
+            )
         )
 
     if file_type in DOCUMENT_TYPES:
@@ -77,18 +73,13 @@ def get_input_media_from_file_id(
                 id=decoded.media_id,
                 access_hash=decoded.access_hash,
                 file_reference=decoded.file_reference
-            ),
-            ttl_seconds=ttl_seconds
+            )
         )
 
     raise ValueError(f"Unknown file id: {file_id}")
 
 
-async def parse_messages(
-    client,
-    messages: "raw.types.messages.Messages",
-    replies: int = 1
-) -> List["types.Message"]:
+async def parse_messages(client, messages: "raw.types.messages.Messages", replies: int = 1) -> List["types.Message"]:
     users = {i.id: i for i in messages.users}
     chats = {i.id: i for i in messages.chats}
 
@@ -266,10 +257,8 @@ def xor(a: bytes, b: bytes) -> bytes:
     return bytes(i ^ j for i, j in zip(a, b))
 
 
-def compute_password_hash(
-    algo: raw.types.PasswordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow,
-    password: str
-) -> bytes:
+def compute_password_hash(algo: raw.types.PasswordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow,
+                          password: str) -> bytes:
     hash1 = sha256(algo.salt1 + password.encode() + algo.salt1)
     hash2 = sha256(algo.salt2 + hash1 + algo.salt2)
     hash3 = hashlib.pbkdf2_hmac("sha512", hash2, algo.salt1, 100000)
@@ -278,10 +267,7 @@ def compute_password_hash(
 
 
 # noinspection PyPep8Naming
-def compute_password_check(
-    r: raw.types.account.Password,
-    password: str
-) -> raw.types.InputCheckPasswordSRP:
+def compute_password_check(r: raw.types.account.Password, password: str) -> raw.types.InputCheckPasswordSRP:
     algo = r.current_algo
 
     p_bytes = algo.p
@@ -349,7 +335,7 @@ async def parse_text_entities(
         for entity in entities:
             entity._client = client
 
-        text, entities = text, [await entity.write() for entity in entities] or None
+        text, entities = text, [await entity.write() for entity in entities]
     else:
         text, entities = (await client.parser.parse(text, parse_mode)).values()
 
@@ -357,10 +343,6 @@ async def parse_text_entities(
         "message": text,
         "entities": entities
     }
-
-
-def zero_datetime() -> datetime:
-    return datetime.fromtimestamp(0, timezone.utc)
 
 
 def timestamp_to_datetime(ts: Optional[int]) -> Optional[datetime]:

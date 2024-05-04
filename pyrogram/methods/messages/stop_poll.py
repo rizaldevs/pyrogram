@@ -34,8 +34,6 @@ class StopPoll:
 
         Stopped polls can't be reopened and nobody will be able to vote in it anymore.
 
-        .. include:: /_includes/usable-by/users-bots.rst
-
         Parameters:
             chat_id (``int`` | ``str``):
                 Unique identifier (int) or username (str) of the target chat.

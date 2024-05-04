@@ -28,8 +28,6 @@ class CreateChannel:
     ) -> "types.Chat":
         """Create a new broadcast channel.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             title (``str``):
                 The channel title.

@@ -30,8 +30,6 @@ class GetPasswordHint:
     ) -> str:
         """Get your Two-Step Verification password hint.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Returns:
             ``str``: On success, the password hint as string is returned.
         """

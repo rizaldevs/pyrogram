@@ -34,8 +34,6 @@ class SendCode:
     ) -> "types.SentCode":
         """Send the confirmation code to the given phone number.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             phone_number (``str``):
                 Phone number in international format (includes the country prefix).

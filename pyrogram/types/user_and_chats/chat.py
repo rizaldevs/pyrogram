@@ -17,7 +17,7 @@
 #  along with Pyrogram.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
-from typing import Union, List, Optional, AsyncGenerator, BinaryIO
+from typing import Union, List
 
 import pyrogram
 from pyrogram import raw, enums
@@ -126,7 +126,7 @@ class Chat(Object):
             The default "send_as" chat.
             Returned only in :meth:`~pyrogram.Client.get_chat`.
 
-        available_reactions (:obj:`~pyrogram.types.ChatReactions`, *optional*):
+        available_reactions (List of ``str``, *optional*):
             Available reactions in the chat.
             Returned only in :meth:`~pyrogram.Client.get_chat`.
     """
@@ -162,7 +162,7 @@ class Chat(Object):
         distance: int = None,
         linked_chat: "types.Chat" = None,
         send_as_chat: "types.Chat" = None,
-        available_reactions: Optional["types.ChatReactions"] = None
+        available_reactions: List[str] = None
     ):
         super().__init__(client)
 
@@ -345,7 +345,7 @@ class Chat(Object):
             if isinstance(full_chat.exported_invite, raw.types.ChatInviteExported):
                 parsed_chat.invite_link = full_chat.exported_invite.link
 
-            parsed_chat.available_reactions = types.ChatReactions._parse(client, full_chat.available_reactions)
+            parsed_chat.available_reactions = full_chat.available_reactions or None
 
         return parsed_chat
 
@@ -477,13 +477,7 @@ class Chat(Object):
             description=description
         )
 
-    async def set_photo(
-        self,
-        *,
-        photo: Union[str, BinaryIO] = None,
-        video: Union[str, BinaryIO] = None,
-        video_start_ts: float = None,
-    ) -> bool:
+    async def set_photo(self, photo: str) -> bool:
         """Bound method *set_photo* of :obj:`~pyrogram.types.Chat`.
 
         Use as a shortcut for:
@@ -498,32 +492,11 @@ class Chat(Object):
         Example:
             .. code-block:: python
 
-                # Set chat photo using a local file
-                await chat.set_photo(photo="photo.jpg")
-
-                # Set chat photo using an existing Photo file_id
-                await chat.set_photo(photo=photo.file_id)
-
-
-                # Set chat video using a local file
-                await chat.set_photo(video="video.mp4")
-
-                # Set chat photo using an existing Video file_id
-                await chat.set_photo(video=video.file_id)
+                await chat.set_photo("photo.png")
 
         Parameters:
-            photo (``str`` | ``BinaryIO``, *optional*):
-                New chat photo. You can pass a :obj:`~pyrogram.types.Photo` file_id, a file path to upload a new photo
-                from your local machine or a binary file-like object with its attribute
-                ".name" set for in-memory uploads.
-
-            video (``str`` | ``BinaryIO``, *optional*):
-                New chat video. You can pass a :obj:`~pyrogram.types.Video` file_id, a file path to upload a new video
-                from your local machine or a binary file-like object with its attribute
-                ".name" set for in-memory uploads.
-
-            video_start_ts (``float``, *optional*):
-                The timestamp in seconds of the video frame to use as photo profile preview.
+            photo (``str``):
+                New chat photo. You can pass a :obj:`~pyrogram.types.Photo` id or a file path to upload a new photo.
 
         Returns:
             ``bool``: True on success.
@@ -535,15 +508,13 @@ class Chat(Object):
 
         return await self._client.set_chat_photo(
             chat_id=self.id,
-            photo=photo,
-            video=video,
-            video_start_ts=video_start_ts
+            photo=photo
         )
 
     async def ban_member(
         self,
         user_id: Union[int, str],
-        until_date: datetime = utils.zero_datetime()
+        until_date: datetime = datetime.fromtimestamp(0)
     ) -> Union["types.Message", bool]:
         """Bound method *ban_member* of :obj:`~pyrogram.types.Chat`.
 
@@ -631,7 +602,7 @@ class Chat(Object):
         self,
         user_id: Union[int, str],
         permissions: "types.ChatPermissions",
-        until_date: datetime = utils.zero_datetime(),
+        until_date: datetime = datetime.fromtimestamp(0),
     ) -> "types.Chat":
         """Bound method *unban_member* of :obj:`~pyrogram.types.Chat`.
 
@@ -820,12 +791,12 @@ class Chat(Object):
             user_id=user_id
         )
 
-    def get_members(
+    async def get_members(
         self,
         query: str = "",
         limit: int = 0,
         filter: "enums.ChatMembersFilter" = enums.ChatMembersFilter.SEARCH
-    ) -> Optional[AsyncGenerator["types.ChatMember", None]]:
+    ) -> List["types.ChatMember"]:
         """Bound method *get_members* of :obj:`~pyrogram.types.Chat`.
 
         Use as a shortcut for:

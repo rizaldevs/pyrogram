@@ -34,8 +34,6 @@ class AddContact:
     ):
         """Add an existing Telegram user as contact, even without a phone number.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             user_id (``int`` | ``str``):
                 Unique identifier (int) or username (str) of the target user.

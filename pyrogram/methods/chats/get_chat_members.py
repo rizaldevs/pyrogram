@@ -70,8 +70,6 @@ class GetChatMembers:
         A chat can be either a basic group, a supergroup or a channel.
         Requires administrator rights in channels.
 
-        .. include:: /_includes/usable-by/users-bots.rst
-
         Parameters:
             chat_id (``int`` | ``str``):
                 Unique identifier (int) or username (str) of the target chat.
@@ -103,14 +101,14 @@ class GetChatMembers:
                     print(member)
 
                 # Get administrators
-                administrators = []
-                async for m in app.get_chat_members(chat_id, filter=enums.ChatMembersFilter.ADMINISTRATORS):
-                    administrators.append(m)
+                administrators = list(await app.get_chat_members(
+                    chat_id,
+                    filter=enums.ChatMembersFilter.ADMINISTRATORS))
 
                 # Get bots
-                bots = []
-                async for m in app.get_chat_members(chat_id, filter=enums.ChatMembersFilter.BOTS):
-                    bots.append(m)
+                bots = list(await app.get_chat_members(
+                    chat_id,
+                    filter=enums.ChatMembersFilter.BOTS))
         """
         peer = await self.resolve_peer(chat_id)
 

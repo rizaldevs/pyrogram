@@ -19,7 +19,7 @@
 from typing import Union
 
 import pyrogram
-from pyrogram import raw, types, errors
+from pyrogram import raw, types
 
 
 class PromoteChatMember:
@@ -33,8 +33,6 @@ class PromoteChatMember:
 
         You must be an administrator in the chat for this to work and must have the appropriate admin rights.
         Pass False for all boolean parameters to demote a user.
-
-        .. include:: /_includes/usable-by/users-bots.rst
 
         Parameters:
             chat_id (``int`` | ``str``):
@@ -63,15 +61,12 @@ class PromoteChatMember:
         if privileges is None:
             privileges = types.ChatPrivileges()
 
-        try:
-            raw_chat_member = (await self.invoke(
-                raw.functions.channels.GetParticipant(
-                    channel=chat_id,
-                    participant=user_id
-                )
-            )).participant
-        except errors.RPCError:
-            raw_chat_member = None
+        raw_chat_member = (await self.invoke(
+            raw.functions.channels.GetParticipant(
+                channel=chat_id,
+                participant=user_id
+            )
+        )).participant
 
         rank = None
         if isinstance(raw_chat_member, raw.types.ChannelParticipantAdmin):

@@ -34,8 +34,6 @@ class GetDiscussionMessage:
         Reply to the returned message to leave a comment on the linked channel post or to continue
         the discussion thread.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             chat_id (``int`` | ``str``):
                 Unique identifier (int) or username (str) of the target chat.

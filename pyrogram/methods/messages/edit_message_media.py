@@ -16,7 +16,6 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with Pyrogram.  If not, see <http://www.gnu.org/licenses/>.
 
-import io
 import os
 import re
 from typing import Union
@@ -41,8 +40,6 @@ class EditMessageMedia:
 
         If a message is a part of a message album, then it can be edited only to a photo or a video. Otherwise, the
         message type can be changed arbitrarily.
-
-        .. include:: /_includes/usable-by/users-bots.rst
 
         Parameters:
             chat_id (``int`` | ``str``):
@@ -92,41 +89,37 @@ class EditMessageMedia:
             message, entities = (await self.parser.parse(caption, parse_mode)).values()
 
         if isinstance(media, types.InputMediaPhoto):
-            if isinstance(media.media, io.BytesIO) or os.path.isfile(media.media):
-                uploaded_media = await self.invoke(
+            if os.path.isfile(media.media):
+                media = await self.invoke(
                     raw.functions.messages.UploadMedia(
                         peer=await self.resolve_peer(chat_id),
                         media=raw.types.InputMediaUploadedPhoto(
-                            file=await self.save_file(media.media),
-                            spoiler=media.has_spoiler
+                            file=await self.save_file(media.media)
                         )
                     )
                 )
 
                 media = raw.types.InputMediaPhoto(
                     id=raw.types.InputPhoto(
-                        id=uploaded_media.photo.id,
-                        access_hash=uploaded_media.photo.access_hash,
-                        file_reference=uploaded_media.photo.file_reference
-                    ),
-                    spoiler=media.has_spoiler
+                        id=media.photo.id,
+                        access_hash=media.photo.access_hash,
+                        file_reference=media.photo.file_reference
+                    )
                 )
             elif re.match("^https?://", media.media):
                 media = raw.types.InputMediaPhotoExternal(
-                    url=media.media,
-                    spoiler=media.has_spoiler
+                    url=media.media
                 )
             else:
                 media = utils.get_input_media_from_file_id(media.media, FileType.PHOTO)
         elif isinstance(media, types.InputMediaVideo):
-            if isinstance(media.media, io.BytesIO) or os.path.isfile(media.media):
-                uploaded_media = await self.invoke(
+            if os.path.isfile(media.media):
+                media = await self.invoke(
                     raw.functions.messages.UploadMedia(
                         peer=await self.resolve_peer(chat_id),
                         media=raw.types.InputMediaUploadedDocument(
                             mime_type=self.guess_mime_type(media.media) or "video/mp4",
                             thumb=await self.save_file(media.thumb),
-                            spoiler=media.has_spoiler,
                             file=await self.save_file(media.media),
                             attributes=[
                                 raw.types.DocumentAttributeVideo(
@@ -145,21 +138,19 @@ class EditMessageMedia:
 
                 media = raw.types.InputMediaDocument(
                     id=raw.types.InputDocument(
-                        id=uploaded_media.document.id,
-                        access_hash=uploaded_media.document.access_hash,
-                        file_reference=uploaded_media.document.file_reference
-                    ),
-                    spoiler=media.has_spoiler
+                        id=media.document.id,
+                        access_hash=media.document.access_hash,
+                        file_reference=media.document.file_reference
+                    )
                 )
             elif re.match("^https?://", media.media):
                 media = raw.types.InputMediaDocumentExternal(
-                    url=media.media,
-                    spoiler=media.has_spoiler
+                    url=media.media
                 )
             else:
                 media = utils.get_input_media_from_file_id(media.media, FileType.VIDEO)
         elif isinstance(media, types.InputMediaAudio):
-            if isinstance(media.media, io.BytesIO) or os.path.isfile(media.media):
+            if os.path.isfile(media.media):
                 media = await self.invoke(
                     raw.functions.messages.UploadMedia(
                         peer=await self.resolve_peer(chat_id),
@@ -195,14 +186,13 @@ class EditMessageMedia:
             else:
                 media = utils.get_input_media_from_file_id(media.media, FileType.AUDIO)
         elif isinstance(media, types.InputMediaAnimation):
-            if isinstance(media.media, io.BytesIO) or os.path.isfile(media.media):
-                uploaded_media = await self.invoke(
+            if os.path.isfile(media.media):
+                media = await self.invoke(
                     raw.functions.messages.UploadMedia(
                         peer=await self.resolve_peer(chat_id),
                         media=raw.types.InputMediaUploadedDocument(
                             mime_type=self.guess_mime_type(media.media) or "video/mp4",
                             thumb=await self.save_file(media.thumb),
-                            spoiler=media.has_spoiler,
                             file=await self.save_file(media.media),
                             attributes=[
                                 raw.types.DocumentAttributeVideo(
@@ -222,21 +212,19 @@ class EditMessageMedia:
 
                 media = raw.types.InputMediaDocument(
                     id=raw.types.InputDocument(
-                        id=uploaded_media.document.id,
-                        access_hash=uploaded_media.document.access_hash,
-                        file_reference=uploaded_media.document.file_reference
-                    ),
-                    spoiler=media.has_spoiler
+                        id=media.document.id,
+                        access_hash=media.document.access_hash,
+                        file_reference=media.document.file_reference
+                    )
                 )
             elif re.match("^https?://", media.media):
                 media = raw.types.InputMediaDocumentExternal(
-                    url=media.media,
-                    spoiler=media.has_spoiler
+                    url=media.media
                 )
             else:
                 media = utils.get_input_media_from_file_id(media.media, FileType.ANIMATION)
         elif isinstance(media, types.InputMediaDocument):
-            if isinstance(media.media, io.BytesIO) or os.path.isfile(media.media):
+            if os.path.isfile(media.media):
                 media = await self.invoke(
                     raw.functions.messages.UploadMedia(
                         peer=await self.resolve_peer(chat_id),

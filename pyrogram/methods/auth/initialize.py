@@ -16,10 +16,10 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with Pyrogram.  If not, see <http://www.gnu.org/licenses/>.
 
-import asyncio
 import logging
 
 import pyrogram
+from pyrogram.syncer import Syncer
 
 log = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ class Initialize:
         self.load_plugins()
 
         await self.dispatcher.start()
+        await Syncer.add(self)
 
-        self.updates_watchdog_task = asyncio.create_task(self.updates_watchdog())
-
+        self.username = (await self.get_me()).username
         self.is_initialized = True

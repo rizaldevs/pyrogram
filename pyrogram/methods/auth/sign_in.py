@@ -35,8 +35,6 @@ class SignIn:
     ) -> Union["types.User", "types.TermsOfService", bool]:
         """Authorize a user in Telegram with a valid confirmation code.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             phone_number (``str``):
                 Phone number in international format (includes the country prefix).

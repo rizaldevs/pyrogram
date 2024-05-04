@@ -38,9 +38,7 @@ class GetChatEventLog:
         Only available for supergroups and channels. Requires administrator rights.
         Results are returned in reverse chronological order (i.e., newest first).
 
-        .. include:: /_includes/usable-by/users.rst
-
-        Parameters:
+        Args:
             chat_id (``int`` | ``str``):
                 Unique identifier (int) or username (str) of the target chat.
 

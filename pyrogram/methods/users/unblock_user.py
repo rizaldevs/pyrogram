@@ -29,8 +29,6 @@ class UnblockUser:
     ) -> bool:
         """Unblock a user.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             user_id (``int`` | ``str``)::
                 Unique identifier (int) or username (str) of the target user.

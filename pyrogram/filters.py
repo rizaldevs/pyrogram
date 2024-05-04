@@ -164,7 +164,7 @@ all = create(all_filter)
 
 # region me_filter
 async def me_filter(_, __, m: Message):
-    return bool(m.from_user and m.from_user.is_self or getattr(m, "outgoing", False))
+    return bool(m.from_user and m.from_user.is_self or m.outgoing)
 
 
 me = create(me_filter)
@@ -423,17 +423,6 @@ async def dice_filter(_, __, m: Message):
 
 dice = create(dice_filter)
 """Filter messages that contain :obj:`~pyrogram.types.Dice` objects."""
-
-
-# endregion
-
-# region media_spoiler
-async def media_spoiler_filter(_, __, m: Message):
-    return bool(m.has_media_spoiler)
-
-
-media_spoiler = create(media_spoiler_filter)
-"""Filter media messages that contain a spoiler."""
 
 
 # endregion
@@ -742,7 +731,6 @@ async def linked_channel_filter(_, __, m: Message):
 linked_channel = create(linked_channel_filter)
 """Filter messages that are automatically forwarded from the linked channel to the group chat."""
 
-
 # endregion
 
 
@@ -769,7 +757,7 @@ def command(commands: Union[str, List[str]], prefixes: Union[str, List[str]] = "
     command_re = re.compile(r"([\"'])(.*?)(?<!\\)\1|(\S+)")
 
     async def func(flt, client: pyrogram.Client, message: Message):
-        username = client.me.username or ""
+        username = client.username or ""
         text = message.text or message.caption
         message.command = None
 

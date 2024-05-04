@@ -28,8 +28,6 @@ class RemoveCloudPassword:
     ) -> bool:
         """Turn off the Two-Step Verification security feature (Cloud Password) on your account.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             password (``str``):
                 Your current password.

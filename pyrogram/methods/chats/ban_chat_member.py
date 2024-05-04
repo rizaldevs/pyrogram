@@ -29,7 +29,7 @@ class BanChatMember:
         self: "pyrogram.Client",
         chat_id: Union[int, str],
         user_id: Union[int, str],
-        until_date: datetime = utils.zero_datetime()
+        until_date: datetime = datetime.fromtimestamp(0)
     ) -> Union["types.Message", bool]:
         """Ban a user from a group, a supergroup or a channel.
         In the case of supergroups and channels, the user will not be able to return to the group on their own using
@@ -40,8 +40,6 @@ class BanChatMember:
             In regular groups (non-supergroups), this method will only work if the "All Members Are Admins" setting is
             off in the target group. Otherwise members may only be removed by the group's creator or by the member
             that added them.
-
-        .. include:: /_includes/usable-by/users-bots.rst
 
         Parameters:
             chat_id (``int`` | ``str``):

@@ -31,7 +31,6 @@ from .edit_message_text import EditMessageText
 from .forward_messages import ForwardMessages
 from .get_chat_history import GetChatHistory
 from .get_chat_history_count import GetChatHistoryCount
-from .get_custom_emoji_stickers import GetCustomEmojiStickers
 from .get_discussion_message import GetDiscussionMessage
 from .get_discussion_replies import GetDiscussionReplies
 from .get_discussion_replies_count import GetDiscussionRepliesCount
@@ -113,7 +112,6 @@ class Messages(
     SendReaction,
     GetDiscussionReplies,
     GetDiscussionRepliesCount,
-    StreamMedia,
-    GetCustomEmojiStickers
+    StreamMedia
 ):
     pass

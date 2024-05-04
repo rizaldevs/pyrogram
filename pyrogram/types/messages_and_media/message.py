@@ -133,11 +133,8 @@ class Message(Object, Update):
             Signature of the post author for messages in channels, or the custom title of an anonymous group
             administrator.
 
-        has_protected_content (``bool``, *optional*):
+        has_protected_content (``str``, *optional*):
             True, if the message can't be forwarded.
-
-        has_media_spoiler (``bool``, *optional*):
-            True, if the message media is covered by a spoiler animation.
 
         text (``str``, *optional*):
             For text messages, the actual UTF-8 text of the message, 0-4096 characters.
@@ -257,9 +254,6 @@ class Message(Object, Update):
 
         views (``int``, *optional*):
             Channel post views.
-	    
-	forwards (``int``, *optional*):
-            Channel post forwards.
 
         via_bot (:obj:`~pyrogram.types.User`):
             The information of the bot that generated the message from an inline query of a user.
@@ -335,7 +329,6 @@ class Message(Object, Update):
         media_group_id: str = None,
         author_signature: str = None,
         has_protected_content: bool = None,
-        has_media_spoiler: bool = None,
         text: Str = None,
         entities: List["types.MessageEntity"] = None,
         caption_entities: List["types.MessageEntity"] = None,
@@ -368,7 +361,6 @@ class Message(Object, Update):
         pinned_message: "Message" = None,
         game_high_score: int = None,
         views: int = None,
-        forwards: int = None,
         via_bot: "types.User" = None,
         outgoing: bool = None,
         matches: List[Match] = None,
@@ -412,7 +404,6 @@ class Message(Object, Update):
         self.media_group_id = media_group_id
         self.author_signature = author_signature
         self.has_protected_content = has_protected_content
-        self.has_media_spoiler = has_media_spoiler
         self.text = text
         self.entities = entities
         self.caption_entities = caption_entities
@@ -445,7 +436,6 @@ class Message(Object, Update):
         self.pinned_message = pinned_message
         self.game_high_score = game_high_score
         self.views = views
-        self.forwards = forwards
         self.via_bot = via_bot
         self.outgoing = outgoing
         self.matches = matches
@@ -663,13 +653,11 @@ class Message(Object, Update):
 
             media = message.media
             media_type = None
-            has_media_spoiler = None
 
             if media:
                 if isinstance(media, raw.types.MessageMediaPhoto):
                     photo = types.Photo._parse(client, media.photo, media.ttl_seconds)
                     media_type = enums.MessageMediaType.PHOTO
-                    has_media_spoiler = media.spoiler
                 elif isinstance(media, raw.types.MessageMediaGeo):
                     location = types.Location._parse(client, media.geo)
                     media_type = enums.MessageMediaType.LOCATION
@@ -694,13 +682,26 @@ class Message(Object, Update):
                             ), "file_name", None
                         )
 
-                        if raw.types.DocumentAttributeAnimated in attributes:
+                        if raw.types.DocumentAttributeAudio in attributes:
+                            audio_attributes = attributes[raw.types.DocumentAttributeAudio]
+
+                            if audio_attributes.voice:
+                                voice = types.Voice._parse(client, doc, audio_attributes)
+                                media_type = enums.MessageMediaType.VOICE
+                            else:
+                                audio = types.Audio._parse(client, doc, audio_attributes, file_name)
+                                media_type = enums.MessageMediaType.AUDIO
+                        elif raw.types.DocumentAttributeAnimated in attributes:
                             video_attributes = attributes.get(raw.types.DocumentAttributeVideo, None)
                             animation = types.Animation._parse(client, doc, video_attributes, file_name)
                             media_type = enums.MessageMediaType.ANIMATION
-                            has_media_spoiler = media.spoiler
                         elif raw.types.DocumentAttributeSticker in attributes:
-                            sticker = await types.Sticker._parse(client, doc, attributes)
+                            sticker = await types.Sticker._parse(
+                                client, doc,
+                                attributes.get(raw.types.DocumentAttributeImageSize, None),
+                                attributes[raw.types.DocumentAttributeSticker],
+                                file_name
+                            )
                             media_type = enums.MessageMediaType.STICKER
                         elif raw.types.DocumentAttributeVideo in attributes:
                             video_attributes = attributes[raw.types.DocumentAttributeVideo]
@@ -711,16 +712,6 @@ class Message(Object, Update):
                             else:
                                 video = types.Video._parse(client, doc, video_attributes, file_name, media.ttl_seconds)
                                 media_type = enums.MessageMediaType.VIDEO
-                                has_media_spoiler = media.spoiler
-                        elif raw.types.DocumentAttributeAudio in attributes:
-                            audio_attributes = attributes[raw.types.DocumentAttributeAudio]
-
-                            if audio_attributes.voice:
-                                voice = types.Voice._parse(client, doc, audio_attributes)
-                                media_type = enums.MessageMediaType.VOICE
-                            else:
-                                audio = types.Audio._parse(client, doc, audio_attributes, file_name)
-                                media_type = enums.MessageMediaType.AUDIO
                         else:
                             document = types.Document._parse(client, doc, file_name)
                             media_type = enums.MessageMediaType.DOCUMENT
@@ -756,7 +747,8 @@ class Message(Object, Update):
             from_user = types.User._parse(client, users.get(user_id, None))
             sender_chat = types.Chat._parse(client, message, users, chats, is_chat=False) if not from_user else None
 
-            reactions = types.MessageReactions._parse(client, message.reactions)
+            reactions = [types.Reaction(emoji=r.reaction, count=r.count, chosen=r.chosen)
+                         for r in message.reactions.results] if message.reactions else None
 
             parsed_message = Message(
                 id=message.id,
@@ -786,7 +778,6 @@ class Message(Object, Update):
                 ),
                 author_signature=message.post_author,
                 has_protected_content=message.noforwards,
-                has_media_spoiler=has_media_spoiler,
                 forward_from=forward_from,
                 forward_sender_name=forward_sender_name,
                 forward_from_chat=forward_from_chat,
@@ -815,7 +806,6 @@ class Message(Object, Update):
                 poll=poll,
                 dice=dice,
                 views=message.views,
-                forwards=message.forwards,
                 via_bot=types.User._parse(client, users.get(message.via_bot_id, None)),
                 outgoing=message.out,
                 reply_markup=reply_markup,
@@ -843,8 +833,7 @@ class Message(Object, Update):
                     except MessageIdsEmpty:
                         pass
 
-            if not parsed_message.poll:  # Do not cache poll messages
-                client.message_cache[(parsed_message.chat.id, parsed_message.id)] = parsed_message
+            client.message_cache[(parsed_message.chat.id, parsed_message.id)] = parsed_message
 
             return parsed_message
 
@@ -989,7 +978,6 @@ class Message(Object, Update):
         caption: str = "",
         parse_mode: Optional["enums.ParseMode"] = None,
         caption_entities: List["types.MessageEntity"] = None,
-        has_spoiler: bool = None,
         duration: int = 0,
         width: int = 0,
         height: int = 0,
@@ -1042,9 +1030,6 @@ class Message(Object, Update):
 
             caption_entities (List of :obj:`~pyrogram.types.MessageEntity`):
                 List of special entities that appear in the caption, which can be specified instead of *parse_mode*.
-
-            has_spoiler (``bool``, *optional*):
-                Pass True if the animation needs to be covered with a spoiler animation.
 
             duration (``int``, *optional*):
                 Duration of sent animation in seconds.
@@ -1114,7 +1099,6 @@ class Message(Object, Update):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
-            has_spoiler=has_spoiler,
             duration=duration,
             width=width,
             height=height,
@@ -1891,7 +1875,6 @@ class Message(Object, Update):
         caption: str = "",
         parse_mode: Optional["enums.ParseMode"] = None,
         caption_entities: List["types.MessageEntity"] = None,
-        has_spoiler: bool = None,
         ttl_seconds: int = None,
         disable_notification: bool = None,
         reply_to_message_id: int = None,
@@ -1941,9 +1924,6 @@ class Message(Object, Update):
 
             caption_entities (List of :obj:`~pyrogram.types.MessageEntity`):
                 List of special entities that appear in the caption, which can be specified instead of *parse_mode*.
-
-            has_spoiler (``bool``, *optional*):
-                Pass True if the photo needs to be covered with a spoiler animation.
 
             ttl_seconds (``int``, *optional*):
                 Self-Destruct Timer.
@@ -2003,7 +1983,6 @@ class Message(Object, Update):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
-            has_spoiler=has_spoiler,
             ttl_seconds=ttl_seconds,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
@@ -2362,7 +2341,6 @@ class Message(Object, Update):
         caption: str = "",
         parse_mode: Optional["enums.ParseMode"] = None,
         caption_entities: List["types.MessageEntity"] = None,
-        has_spoiler: bool = None,
         ttl_seconds: int = None,
         duration: int = 0,
         width: int = 0,
@@ -2417,9 +2395,6 @@ class Message(Object, Update):
 
             caption_entities (List of :obj:`~pyrogram.types.MessageEntity`):
                 List of special entities that appear in the caption, which can be specified instead of *parse_mode*.
-
-            has_spoiler (``bool``, *optional*):
-                Pass True if the video needs to be covered with a spoiler animation.
 
             ttl_seconds (``int``, *optional*):
                 Self-Destruct Timer.
@@ -2497,7 +2472,6 @@ class Message(Object, Update):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
-            has_spoiler=has_spoiler,
             ttl_seconds=ttl_seconds,
             duration=duration,
             width=width,
@@ -3070,19 +3044,18 @@ class Message(Object, Update):
             RPCError: In case of a Telegram RPC error.
         """
         if self.service:
-            log.warning("Service messages cannot be copied. chat_id: %s, message_id: %s",
-                        self.chat.id, self.id)
+            log.warning(f"Service messages cannot be copied. "
+                        f"chat_id: {self.chat.id}, message_id: {self.id}")
         elif self.game and not await self._client.storage.is_bot():
-            log.warning("Users cannot send messages with Game media type. chat_id: %s, message_id: %s",
-                        self.chat.id, self.id)
+            log.warning(f"Users cannot send messages with Game media type. "
+                        f"chat_id: {self.chat.id}, message_id: {self.id}")
         elif self.empty:
-            log.warning("Empty messages cannot be copied.")
+            log.warning(f"Empty messages cannot be copied. ")
         elif self.text:
             return await self._client.send_message(
                 chat_id,
                 text=self.text,
                 entities=self.entities,
-                parse_mode=enums.ParseMode.DISABLED,
                 disable_web_page_preview=not self.web_page,
                 disable_notification=disable_notification,
                 reply_to_message_id=reply_to_message_id,
@@ -3337,7 +3310,7 @@ class Message(Object, Update):
         else:
             await self.reply(button, quote=quote)
 
-    async def react(self, emoji: str = "", big: bool = False) -> bool:
+    async def react(self, emoji: str = "") -> bool:
         """Bound method *react* of :obj:`~pyrogram.types.Message`.
 
         Use as a shortcut for:
@@ -3346,7 +3319,7 @@ class Message(Object, Update):
 
             await client.send_reaction(
                 chat_id=chat_id,
-                message_id=message.id,
+                message_id=message.message_id,
                 emoji="🔥"
             )
 
@@ -3359,10 +3332,6 @@ class Message(Object, Update):
             emoji (``str``, *optional*):
                 Reaction emoji.
                 Pass "" as emoji (default) to retract the reaction.
-             
-            big (``bool``, *optional*):
-                Pass True to show a bigger and longer reaction.
-                Defaults to False.
 
         Returns:
             ``bool``: On success, True is returned.
@@ -3373,9 +3342,8 @@ class Message(Object, Update):
 
         return await self._client.send_reaction(
             chat_id=self.chat.id,
-            message_id=self.id,
-            emoji=emoji,
-            big=big
+            message_id=self.message_id,
+            emoji=emoji
         )
 
     async def retract_vote(

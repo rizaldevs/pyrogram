@@ -46,7 +46,7 @@ class OnRawUpdate:
                 func.handlers.append(
                     (
                         pyrogram.handlers.RawUpdateHandler(func),
-                        group
+                        group if self is None else group
                     )
                 )
 

@@ -27,12 +27,9 @@ class SendReaction:
         self: "pyrogram.Client",
         chat_id: Union[int, str],
         message_id: int,
-        emoji: str = "",
-        big: bool = False
+        emoji: str = ""
     ) -> bool:
         """Send a reaction to a message.
-
-        .. include:: /_includes/usable-by/users.rst
 
         Parameters:
             chat_id (``int`` | ``str``):
@@ -44,10 +41,6 @@ class SendReaction:
             emoji (``str``, *optional*):
                 Reaction emoji.
                 Pass "" as emoji (default) to retract the reaction.
-            
-            big (``bool``, *optional*):
-                Pass True to show a bigger and longer reaction.
-                Defaults to False.
 
         Returns:
             ``bool``: On success, True is returned.
@@ -65,8 +58,7 @@ class SendReaction:
             raw.functions.messages.SendReaction(
                 peer=await self.resolve_peer(chat_id),
                 msg_id=message_id,
-                reaction=[raw.types.ReactionEmoji(emoticon=emoji)] if emoji else None,
-                big=big
+                reaction=emoji
             )
         )
 

@@ -32,8 +32,6 @@ class RecoverPassword:
     ) -> "types.User":
         """Recover your password with a recovery code and log in.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             recovery_code (``str``):
                 The recovery code sent via email.

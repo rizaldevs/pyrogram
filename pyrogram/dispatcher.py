@@ -151,7 +151,7 @@ class Dispatcher:
                     self.loop.create_task(self.handler_worker(self.locks_list[-1]))
                 )
 
-            log.info("Started %s HandlerTasks", self.client.workers)
+            log.info(f"Started {self.client.workers} HandlerTasks")
 
     async def stop(self):
         if not self.client.no_updates:
@@ -164,7 +164,7 @@ class Dispatcher:
             self.handler_worker_tasks.clear()
             self.groups.clear()
 
-            log.info("Stopped %s HandlerTasks", self.client.workers)
+            log.info(f"Stopped {self.client.workers} HandlerTasks")
 
     def add_handler(self, handler, group: int):
         async def fn():
@@ -226,7 +226,7 @@ class Dispatcher:
                                     if await handler.check(self.client, parsed_update):
                                         args = (parsed_update,)
                                 except Exception as e:
-                                    log.exception(e)
+                                    log.error(e, exc_info=True)
                                     continue
 
                             elif isinstance(handler, RawUpdateHandler):
@@ -250,10 +250,10 @@ class Dispatcher:
                             except pyrogram.ContinuePropagation:
                                 continue
                             except Exception as e:
-                                log.exception(e)
+                                log.error(e, exc_info=True)
 
                             break
             except pyrogram.StopPropagation:
                 pass
             except Exception as e:
-                log.exception(e)
+                log.error(e, exc_info=True)

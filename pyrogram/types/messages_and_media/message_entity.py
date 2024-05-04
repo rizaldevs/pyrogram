@@ -40,17 +40,13 @@ class MessageEntity(Object):
             Length of the entity in UTF-16 code units.
 
         url (``str``, *optional*):
-            For :obj:`~pyrogram.enums.MessageEntityType.TEXT_LINK` only, url that will be opened after user taps on the text.
+            For "text_link" only, url that will be opened after user taps on the text.
 
         user (:obj:`~pyrogram.types.User`, *optional*):
-            For :obj:`~pyrogram.enums.MessageEntityType.TEXT_MENTION` only, the mentioned user.
+            For "text_mention" only, the mentioned user.
 
-        language (``str``, *optional*):
+        language (``str``. *optional*):
             For "pre" only, the programming language of the entity text.
-
-        custom_emoji_id (``int``, *optional*):
-            For :obj:`~pyrogram.enums.MessageEntityType.CUSTOM_EMOJI` only, unique identifier of the custom emoji.
-            Use :meth:`~pyrogram.Client.get_custom_emoji_stickers` to get full information about the sticker.
     """
 
     def __init__(
@@ -62,8 +58,7 @@ class MessageEntity(Object):
         length: int,
         url: str = None,
         user: "types.User" = None,
-        language: str = None,
-        custom_emoji_id: int = None
+        language: str = None
     ):
         super().__init__(client)
 
@@ -73,27 +68,16 @@ class MessageEntity(Object):
         self.url = url
         self.user = user
         self.language = language
-        self.custom_emoji_id = custom_emoji_id
 
     @staticmethod
     def _parse(client, entity: "raw.base.MessageEntity", users: dict) -> Optional["MessageEntity"]:
-        # Special case for InputMessageEntityMentionName -> MessageEntityType.TEXT_MENTION
-        # This happens in case of UpdateShortSentMessage inside send_message() where entities are parsed from the input
-        if isinstance(entity, raw.types.InputMessageEntityMentionName):
-            entity_type = enums.MessageEntityType.TEXT_MENTION
-            user_id = entity.user_id.user_id
-        else:
-            entity_type = enums.MessageEntityType(entity.__class__)
-            user_id = getattr(entity, "user_id", None)
-
         return MessageEntity(
-            type=entity_type,
+            type=enums.MessageEntityType(entity.__class__),
             offset=entity.offset,
             length=entity.length,
             url=getattr(entity, "url", None),
-            user=types.User._parse(client, users.get(user_id, None)),
+            user=types.User._parse(client, users.get(getattr(entity, "user_id", None), None)),
             language=getattr(entity, "language", None),
-            custom_emoji_id=getattr(entity, "document_id", None),
             client=client
         )
 
@@ -111,10 +95,6 @@ class MessageEntity(Object):
 
         if self.language is None:
             args.pop("language")
-
-        args.pop("custom_emoji_id")
-        if self.custom_emoji_id is not None:
-            args["document_id"] = self.custom_emoji_id
 
         entity = self.type.value
 

@@ -27,7 +27,7 @@ class InputMediaAnimation(InputMedia):
     """An animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent inside an album.
 
     Parameters:
-        media (``str`` | ``BinaryIO``):
+        media (``str``):
             Animation to send.
             Pass a file_id as string to send a file that exists on the Telegram servers or
             pass a file path as string to upload a new file that exists on your local machine or
@@ -59,9 +59,6 @@ class InputMediaAnimation(InputMedia):
 
         duration (``int``, *optional*):
             Animation duration.
-
-        has_spoiler (``bool``, *optional*):
-            Pass True if the photo needs to be covered with a spoiler animation.
     """
 
     def __init__(
@@ -73,8 +70,7 @@ class InputMediaAnimation(InputMedia):
         caption_entities: List[MessageEntity] = None,
         width: int = 0,
         height: int = 0,
-        duration: int = 0,
-        has_spoiler: bool = None
+        duration: int = 0
     ):
         super().__init__(media, caption, parse_mode, caption_entities)
 
@@ -82,4 +78,3 @@ class InputMediaAnimation(InputMedia):
         self.width = width
         self.height = height
         self.duration = duration
-        self.has_spoiler = has_spoiler

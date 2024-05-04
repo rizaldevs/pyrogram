@@ -18,7 +18,6 @@
 
 from datetime import datetime
 from typing import Dict
-from typing import Optional
 
 import pyrogram
 from pyrogram import raw, utils
@@ -104,10 +103,7 @@ class ChatInviteLink(Object):
         client: "pyrogram.Client",
         invite: "raw.base.ExportedChatInvite",
         users: Dict[int, "raw.types.User"] = None
-    ) -> Optional["ChatInviteLink"]:
-        if not isinstance(invite, raw.types.ChatInviteExported):
-            return None
-
+    ) -> "ChatInviteLink":
         creator = (
             types.User._parse(client, users[invite.admin_id])
             if users is not None

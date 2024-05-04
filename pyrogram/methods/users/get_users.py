@@ -17,7 +17,7 @@
 #  along with Pyrogram.  If not, see <http://www.gnu.org/licenses/>.
 
 import asyncio
-from typing import Union, List, Iterable
+from typing import Iterable, Union, List
 
 import pyrogram
 from pyrogram import raw
@@ -27,21 +27,21 @@ from pyrogram import types
 class GetUsers:
     async def get_users(
         self: "pyrogram.Client",
-        user_ids: Union[int, str, Iterable[Union[int, str]]]
+        user_ids: Union[Iterable[Union[int, str]], int, str]
     ) -> Union["types.User", List["types.User"]]:
         """Get information about a user.
         You can retrieve up to 200 users at once.
 
-        .. include:: /_includes/usable-by/users-bots.rst
-
         Parameters:
-            user_ids (``int`` | ``str`` | Iterable of ``int`` or ``str``):
+            user_ids (``iterable``):
                 A list of User identifiers (id or username) or a single user id/username.
                 For a contact that exists in your Telegram address book you can use his phone number (str).
+                Iterators and Generators are also accepted.
 
         Returns:
-            :obj:`~pyrogram.types.User` | List of :obj:`~pyrogram.types.User`: In case *user_ids* was not a list,
-            a single user is returned, otherwise a list of users is returned.
+            :obj:`~pyrogram.types.User` | List of :obj:`~pyrogram.types.User`: In case *user_ids* was an integer or
+            string the single requested user is returned, otherwise, in case *user_ids* was an iterable a list of users
+            is returned, even if the iterable contained one item only.
 
         Example:
             .. code-block:: python
@@ -52,7 +52,6 @@ class GetUsers:
                 # Get information about multiple users at once
                 await app.get_users([user_id1, user_id2, user_id3])
         """
-
         is_iterable = not isinstance(user_ids, (int, str))
         user_ids = list(user_ids) if is_iterable else [user_ids]
         user_ids = await asyncio.gather(*[self.resolve_peer(i) for i in user_ids])

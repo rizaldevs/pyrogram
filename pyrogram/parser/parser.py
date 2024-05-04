@@ -49,9 +49,7 @@ class Parser:
             return await self.html.parse(text)
 
         if mode == enums.ParseMode.DISABLED:
-            return {"message": text, "entities": None}
-
-        raise ValueError(f'Invalid parse mode "{mode}"')
+            return {"message": text, "entities": []}
 
     @staticmethod
     def unparse(text: str, entities: list, is_html: bool):

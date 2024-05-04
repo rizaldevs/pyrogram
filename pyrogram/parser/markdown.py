@@ -21,7 +21,6 @@ import re
 from typing import Optional
 
 import pyrogram
-from pyrogram.enums import MessageEntityType
 from . import utils
 from .html import HTML
 
@@ -105,12 +104,6 @@ class Markdown:
                 delims.remove(delim)
                 tag = CLOSING_TAG.format(tag)
 
-            if delim == PRE_DELIM and delim in delims:
-                delim_and_language = text[text.find(PRE_DELIM):].split("\n")[0]
-                language = delim_and_language[len(PRE_DELIM):]
-                text = utils.replace_once(text, delim_and_language, f'<pre language="{language}">', start)
-                continue
-
             text = utils.replace_once(text, delim, tag, start)
 
         return await self.html.parse(text)
@@ -126,29 +119,25 @@ class Markdown:
             start = entity.offset
             end = start + entity.length
 
-            if entity_type == MessageEntityType.BOLD:
+            if entity_type == "bold":
                 start_tag = end_tag = BOLD_DELIM
-            elif entity_type == MessageEntityType.ITALIC:
+            elif entity_type == "italic":
                 start_tag = end_tag = ITALIC_DELIM
-            elif entity_type == MessageEntityType.UNDERLINE:
+            elif entity_type == "underline":
                 start_tag = end_tag = UNDERLINE_DELIM
-            elif entity_type == MessageEntityType.STRIKETHROUGH:
+            elif entity_type == "strikethrough":
                 start_tag = end_tag = STRIKE_DELIM
-            elif entity_type == MessageEntityType.CODE:
+            elif entity_type == "code":
                 start_tag = end_tag = CODE_DELIM
-            elif entity_type == MessageEntityType.PRE:
-                language = getattr(entity, "language", "") or ""
-                start_tag = f"{PRE_DELIM}{language}\n"
-                end_tag = f"\n{PRE_DELIM}"
-            elif entity_type == MessageEntityType.BLOCKQUOTE:
+            elif entity_type in ("pre", "blockquote"):
                 start_tag = end_tag = PRE_DELIM
-            elif entity_type == MessageEntityType.SPOILER:
+            elif entity_type == "spoiler":
                 start_tag = end_tag = SPOILER_DELIM
-            elif entity_type == MessageEntityType.TEXT_LINK:
+            elif entity_type == "text_link":
                 url = entity.url
                 start_tag = "["
                 end_tag = f"]({url})"
-            elif entity_type == MessageEntityType.TEXT_MENTION:
+            elif entity_type == "text_mention":
                 user = entity.user
                 start_tag = "["
                 end_tag = f"](tg://user?id={user.id})"

@@ -16,17 +16,13 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with Pyrogram.  If not, see <http://www.gnu.org/licenses/>.
 
-import asyncio
 from typing import List
 
 import pyrogram
 from .idle import idle
 
 
-async def compose(
-    clients: List["pyrogram.Client"],
-    sequential: bool = False
-):
+async def compose(clients: List["pyrogram.Client"]):
     """Run multiple clients at once.
 
     This method can be used to run multiple clients at once and can be found directly in the ``pyrogram`` package.
@@ -37,10 +33,6 @@ async def compose(
         clients (List of :obj:`~pyrogram.Client`):
             A list of client objects to run.
 
-        sequential (``bool``, *optional*):
-            Pass True to run clients sequentially.
-            Defaults to False (run clients concurrently)
-
     Example:
         .. code-block:: python
 
@@ -49,30 +41,22 @@ async def compose(
 
 
             async def main():
-                apps = [
-                    Client("account1"),
-                    Client("account2"),
-                    Client("account3")
-                ]
+                app1 = Client("account1")
+                app2 = Client("account2")
+                app3 = Client("account3")
 
                 ...
 
-                await compose(apps)
+                await compose([app1, app2, app3])
 
 
             asyncio.run(main())
 
     """
-    if sequential:
-        for c in clients:
-            await c.start()
-    else:
-        await asyncio.gather(*[c.start() for c in clients])
+    for c in clients:
+        await c.start()
 
     await idle()
 
-    if sequential:
-        for c in clients:
-            await c.stop()
-    else:
-        await asyncio.gather(*[c.stop() for c in clients])
+    for c in clients:
+        await c.stop()

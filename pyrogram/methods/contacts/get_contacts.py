@@ -32,8 +32,6 @@ class GetContacts:
     ) -> List["types.User"]:
         """Get contacts from your Telegram address book.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Returns:
             List of :obj:`~pyrogram.types.User`: On success, a list of users is returned.
 

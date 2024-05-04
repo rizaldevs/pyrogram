@@ -31,8 +31,6 @@ class UpdateProfile:
 
         You can omit the parameters you don't want to change.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             first_name (``str``, *optional*):
                 The new first name.

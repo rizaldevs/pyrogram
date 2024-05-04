@@ -30,8 +30,6 @@ class LeaveChat:
     ):
         """Leave a group chat or channel.
 
-        .. include:: /_includes/usable-by/users-bots.rst
-
         Parameters:
             chat_id (``int`` | ``str``):
                 Unique identifier for the target chat or username of the target channel/supergroup

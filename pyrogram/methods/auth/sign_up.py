@@ -35,8 +35,6 @@ class SignUp:
     ) -> "types.User":
         """Register a new user in Telegram.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             phone_number (``str``):
                 Phone number in international format (includes the country prefix).

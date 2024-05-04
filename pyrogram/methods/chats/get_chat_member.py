@@ -32,8 +32,6 @@ class GetChatMember:
     ) -> "types.ChatMember":
         """Get information about one member of a chat.
 
-        .. include:: /_includes/usable-by/users-bots.rst
-
         Parameters:
             chat_id (``int`` | ``str``):
                 Unique identifier (int) or username (str) of the target chat.

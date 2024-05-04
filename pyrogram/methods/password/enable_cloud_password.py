@@ -34,8 +34,6 @@ class EnableCloudPassword:
 
         This password will be asked when you log-in on a new device in addition to the SMS code.
 
-        .. include:: /_includes/usable-by/users.rst
-
         Parameters:
             password (``str``):
                 Your password.
